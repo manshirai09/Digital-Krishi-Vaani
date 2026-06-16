@@ -1,0 +1,6 @@
+{
+  "name": "Digital KrishiVaani",
+  "description": "Digital KrishiVaani is a smart, fully responsive agriculture platform featuring AI crop recommendations, real-time crop disease diagnosis, local mandi market price analytics, government scheme eligibility checks, water sustainability tracking, and voice-supported multilingual AI chat (Kisan Mitra).",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
