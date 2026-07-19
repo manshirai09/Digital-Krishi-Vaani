@@ -3,7 +3,12 @@ import { motion, AnimatePresence } from "motion/react";
 import { MessageSquare, X, Send, Mic, MicOff, Volume2, VolumeX, Sparkles, AlertCircle } from "lucide-react";
 import { ChatMessage } from "../types";
 
-export function KisanMitraFloating() {
+interface KisanMitraFloatingProps {
+  accent?: string;
+  sttLanguage?: string;
+}
+
+export function KisanMitraFloating({ accent = "en-IN", sttLanguage = "en-IN" }: KisanMitraFloatingProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -46,15 +51,57 @@ export function KisanMitraFloating() {
 
       const utterance = new SpeechSynthesisUtterance(cleanText.slice(0, 300)); // limit TTS length
       
-      // Attempt to find a suitable English or Indian regional voice
-      const voices = synthRef.current.getVoices();
-      const indianVoice = voices.find(
-        (voice) => voice.lang.includes("IN") || voice.name.toLowerCase().includes("india")
-      );
-      if (indianVoice) {
-        utterance.voice = indianVoice;
+      let langCode = "en-IN";
+      if (accent.startsWith("hi-IN")) {
+        langCode = "hi-IN";
+      } else if (accent === "pa-IN") {
+        langCode = "pa-IN";
+      } else if (accent === "har-IN") {
+        langCode = "hi-IN"; // Haryanvi fallback to Hindi language model
+      } else if (accent === "en-GB") {
+        langCode = "en-GB";
       }
-      utterance.rate = 0.95; // slightly slower for better comprehensibility
+      utterance.lang = langCode;
+
+      const voices = synthRef.current.getVoices();
+      let chosenVoice = null;
+
+      if (accent === "hi-IN-male") {
+        chosenVoice = voices.find(v => v.lang.toLowerCase().includes("hi") && v.name.toLowerCase().includes("male"))
+          || voices.find(v => v.lang.toLowerCase().includes("hi"));
+      } else if (accent === "hi-IN-female") {
+        chosenVoice = voices.find(v => v.lang.toLowerCase().includes("hi") && v.name.toLowerCase().includes("female"))
+          || voices.find(v => v.lang.toLowerCase().includes("hi"));
+      } else {
+        chosenVoice = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
+      }
+
+      if (!chosenVoice) {
+        chosenVoice = voices.find(
+          (voice) => voice.lang.includes("IN") || voice.name.toLowerCase().includes("india")
+        );
+      }
+
+      if (chosenVoice) {
+        utterance.voice = chosenVoice;
+      }
+
+      if (accent === "har-IN") {
+        utterance.pitch = 0.82; // slightly deeper rustic Haryanvi style
+        utterance.rate = 0.9;
+      } else if (accent === "pa-IN") {
+        utterance.pitch = 1.05; // warm energetic Punjabi tone
+        utterance.rate = 0.95;
+      } else if (accent === "hi-IN-female") {
+        utterance.pitch = 1.15; // slightly higher pitch for female accent
+        utterance.rate = 0.95;
+      } else if (accent === "hi-IN-male") {
+        utterance.pitch = 0.92; // masculine pitch
+        utterance.rate = 0.95;
+      } else {
+        utterance.rate = 0.95; // slightly slower for better comprehensibility
+      }
+
       synthRef.current.speak(utterance);
     } catch (err) {
       console.warn("Speech Synthesis failed:", err);
@@ -139,7 +186,7 @@ export function KisanMitraFloating() {
     if (SpeechRecognition) {
       setIsListening(true);
       const recognition = new SpeechRecognition();
-      recognition.lang = "en-IN"; // support Indian English, Hindi inputs
+      recognition.lang = sttLanguage; // dynamic language mode!
       recognition.interimResults = false;
       recognition.maxAlternatives = 1;
 
@@ -334,7 +381,9 @@ export function KisanMitraFloating() {
                     <span className="inline-block w-1.5 h-3 bg-emerald-600 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }} />
                   </div>
                   <span className="font-semibold text-[11px] uppercase tracking-wider text-emerald-700">Listening to Your Voice...</span>
-                  <span className="text-[10px] text-slate-500 mt-1">Speaking English / Hindi regional dialect</span>
+                  <span className="text-[10px] text-slate-500 mt-1 font-mono">
+                    Input: {sttLanguage === "hi-IN" ? "Hindi (हिंदी)" : sttLanguage === "pa-IN" ? "Punjabi (ਪੰਜਾਬੀ)" : sttLanguage === "har-IN" ? "Haryanvi (हरियाणवी)" : "English (India)"}
+                  </span>
                 </div>
               )}
 

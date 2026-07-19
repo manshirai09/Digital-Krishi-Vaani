@@ -33,13 +33,39 @@ import {
   Trash2,
   DollarSign,
   Droplet,
-  AlertCircle
+  AlertCircle,
+  Volume2
 } from "lucide-react";
 import { AppView, UserRole, CropRecommendationInput, CropRecommendationResult, DiseaseDiagnosisResult, MandiPriceItem, GovScheme, ForumPost, MarketplaceProduct } from "./types";
 import { INITIAL_MANDI_PRICE_LIST, INITIAL_GOV_SCHEMES_LIST, INITIAL_FORUM_POSTS, INITIAL_MARKETPLACE_PRODUCTS } from "./data";
 import { KisanMitraFloating } from "./components/KisanMitraFloating";
 import { ElegantLineChart, ClusteredRevenueBarChart, RadialProgressGauge, EcoBadgeWidget, WeatherVisualIcon } from "./components/Widgets";
 import { KrishiVaaniLogo } from "./components/KrishiVaaniLogo";
+
+const dashboardGridVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+};
+
+const dashboardCardVariants = {
+  hidden: { opacity: 0, y: 15, scale: 0.98 },
+  show: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 110,
+      damping: 14
+    }
+  }
+};
 
 export default function App() {
   // Authentication & Premium Loading States
@@ -107,6 +133,11 @@ export default function App() {
   const [activeMilestoneName, setActiveMilestoneName] = useState<string>("Peak Flowering & Square Boll Transition");
   const [activeCropCycleDays, setActiveCropCycleDays] = useState<number>(68);
   const [appliedIrrigationGuideline, setAppliedIrrigationGuideline] = useState<boolean>(false);
+
+  // Voice & Profile Settings States
+  const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
+  const [aiAccent, setAiAccent] = useState<string>("en-IN");
+  const [sttLanguage, setSttLanguage] = useState<string>("en-IN");
   
   // Crop planner inputs & results
   const [plannerInput, setPlannerInput] = useState<CropRecommendationInput>({
@@ -639,17 +670,125 @@ export default function App() {
             )}
           </button>
 
-          {/* Secure Logout Portal Lock */}
-          <button
-            onClick={() => {
-              setIsLoggedIn(false);
-              setLoginError(null);
-            }}
-            className="p-2 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-955/20 hover:text-rose-600 border border-slate-150 dark:border-slate-700 rounded-xl transition text-slate-600 dark:text-slate-300 cursor-pointer"
-            title="Secure Portal Logout"
-          >
-            <User className="w-4 h-4" />
-          </button>
+          {/* User Profile & Voice Settings Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className={`p-2 border rounded-xl transition cursor-pointer flex items-center gap-1.5 ${
+                showProfileMenu
+                  ? "bg-emerald-600 text-white border-emerald-500 shadow-md"
+                  : "bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-350 border-slate-150 dark:border-slate-700"
+              }`}
+              title="User Profile & Voice Settings"
+            >
+              <User className="w-4 h-4" />
+              <span className="text-[10px] font-bold hidden md:inline select-none">
+                {userRole === "farmer" ? "Ramesh" : userRole === "expert" ? "Dr. Anil" : "Admin"}
+              </span>
+            </button>
+
+            <AnimatePresence>
+              {showProfileMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2.5 w-76 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 z-50 text-xs text-slate-800 dark:text-slate-200 space-y-4"
+                >
+                  {/* Profile Header */}
+                  <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 font-extrabold flex items-center justify-center text-sm border border-emerald-200/45">
+                      {userRole === "farmer" ? "RK" : userRole === "expert" ? "AS" : "LP"}
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 leading-none">
+                        {userRole === "farmer" ? "Ramesh Kumar" : userRole === "expert" ? "Dr. Anil Sharma" : "Lalit Patil"}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold mt-1 uppercase tracking-wider font-mono">
+                        {userRole === "farmer" ? "Bt Cotton Grower" : userRole === "expert" ? "Senior Agronomist" : "Chief Administrator"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Context details */}
+                  <div className="bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-800/80 p-2.5 rounded-xl space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 select-none">
+                    <p className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-400">Node Hub:</span>
+                      <strong className="text-slate-700 dark:text-slate-300">
+                        {userRole === "farmer" ? "Bathinda, Punjab" : userRole === "expert" ? "Ludhiana Research Lab" : "Chandigarh Apex HQ"}
+                      </strong>
+                    </p>
+                    <p className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-400">Status:</span>
+                      <strong className="text-emerald-600 dark:text-emerald-500 font-extrabold">Active Core ✅</strong>
+                    </p>
+                  </div>
+
+                  {/* VOICE SETTINGS SUB-MENU */}
+                  <div className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-3">
+                    <div className="flex items-center gap-1.5 text-[#2E7D32] dark:text-emerald-400 font-extrabold text-[11px] uppercase tracking-wider">
+                      <Volume2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Kisan Mitra Voice Settings</span>
+                    </div>
+
+                    {/* Accent Preference Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide block">
+                        AI Vocal Accent:
+                      </label>
+                      <select
+                        value={aiAccent}
+                        onChange={(e) => setAiAccent(e.target.value)}
+                        className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-720 text-slate-750 dark:text-slate-250 py-1.5 px-2.5 rounded-xl cursor-pointer focus:ring-1 focus:ring-emerald-500 outline-none"
+                      >
+                        <option value="en-IN">Indian English Accent (en-IN)</option>
+                        <option value="hi-IN-male">Hindi Male Voice (hi-IN)</option>
+                        <option value="hi-IN-female">Hindi Female Voice (hi-IN)</option>
+                        <option value="pa-IN">Punjabi Accent Tone (pa-IN)</option>
+                        <option value="har-IN">Haryanvi Local Folk Tone (har-IN)</option>
+                        <option value="en-GB">British English Accent (en-GB)</option>
+                      </select>
+                    </div>
+
+                    {/* Speech to Text Language Mode Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide block">
+                        STT Input Mode:
+                      </label>
+                      <select
+                        value={sttLanguage}
+                        onChange={(e) => setSttLanguage(e.target.value)}
+                        className="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-720 text-slate-750 dark:text-slate-250 py-1.5 px-2.5 rounded-xl cursor-pointer focus:ring-1 focus:ring-emerald-500 outline-none"
+                      >
+                        <option value="en-IN">English (India) [en-IN]</option>
+                        <option value="hi-IN">Hindi (हिंदी) [hi-IN]</option>
+                        <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ) [pa-IN]</option>
+                        <option value="har-IN">Haryanvi (हरियाणवी) [har-IN]</option>
+                      </select>
+                    </div>
+
+                    <p className="text-[9px] text-slate-400 italic">
+                      Adjust accent or speech recognition input to hear and speak with Kisan Mitra in your preferred dialect.
+                    </p>
+                  </div>
+
+                  {/* Logout Button */}
+                  <button
+                    onClick={() => {
+                      setIsLoggedIn(false);
+                      setLoginError(null);
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-955/20 dark:hover:bg-rose-950/40 dark:text-rose-400 font-extrabold rounded-xl transition text-center cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                    <span>Secure Portal Logout</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
         </div>
       </header>
@@ -927,11 +1066,17 @@ export default function App() {
                 exit={{ opacity: 0 }}
                 className="space-y-6 animate-fade-in text-slate-800 dark:text-slate-100"
               >
-                {/* Bento Grid Layout Wrapper */}
-                <div id="dashboard-bento" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Bento Grid Layout Wrapper with Staggered Entrance Animations */}
+                <motion.div
+                  id="dashboard-bento"
+                  variants={dashboardGridVariants}
+                  initial="hidden"
+                  animate="show"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                >
                   
                   {/* CARD 1: MAIN PLOT STATUS (Welcome & Active Crop info) - col-span-2 */}
-                  <div className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-between min-h-[220px]">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-between min-h-[220px]">
                     
                     {/* Glowing pulsate top-right action badge for AI milestone detection */}
                     {hasCropMilestoneAlert && (
@@ -1023,10 +1168,10 @@ export default function App() {
                         Launch AI Advisor <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* CARD 2: PREMIUM WEATHER SNAPSHOT WITH GRADIENT - col-span-1 */}
-                  <div className="col-span-1 bg-gradient-to-br from-sky-400 to-blue-600 p-6 rounded-3xl text-white shadow-lg shadow-blue-500/10 relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-xl flex flex-col justify-between min-h-[220px]">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 bg-gradient-to-br from-sky-400 to-blue-600 p-6 rounded-3xl text-white shadow-lg shadow-blue-500/10 relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-xl flex flex-col justify-between min-h-[220px]">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
                     
                     <div className="flex justify-between items-start">
@@ -1050,10 +1195,10 @@ export default function App() {
                         <span>Sowing warning: Storm anticipated June 10</span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* CARD 3: REGIONAL MANDI LIVE PRICES LIST - col-span-1 spans 2 rows */}
-                  <div className="col-span-1 row-span-1 md:row-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between min-h-[460px]">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 row-span-1 md:row-span-2 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between min-h-[460px]">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between border-b border-slate-50 dark:border-slate-800/50 pb-3">
                         <div>
@@ -1087,20 +1232,20 @@ export default function App() {
                     >
                       Browse full Mandi Prices <ChevronRight className="w-4 h-4" />
                     </button>
-                  </div>
+                  </motion.div>
 
                   {/* CARD 4: ECO STRENGTH SHIELD STATUS - col-span-1 */}
-                  <div className="col-span-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-center">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-center">
                     <EcoBadgeWidget score={88} />
-                  </div>
+                  </motion.div>
 
                   {/* CARD 5: WATER RETENTION DRY INDEX - col-span-1 */}
-                  <div className="col-span-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-center">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-5 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md flex flex-col justify-center">
                     <RadialProgressGauge value={85} label="Conservation ratio" subtitle="Drip Sowing Installed" />
-                  </div>
+                  </motion.div>
 
                   {/* CARD 6: ROI PROFITABILITY ACCELERATOR CARD - col-span-1 */}
-                  <div className="col-span-1 bg-[#2E7D32] p-6 rounded-3xl text-white shadow-lg shadow-emerald-800/20 relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-xl flex flex-col justify-between min-h-[200px]">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 bg-[#2E7D32] p-6 rounded-3xl text-white shadow-lg shadow-emerald-800/20 relative overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-xl flex flex-col justify-between min-h-[200px]">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none" />
                     
                     <div className="space-y-1.5">
@@ -1118,10 +1263,10 @@ export default function App() {
                         Cost Model
                       </button>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* CARD 7: GOVERNMENT PM-RELIEF SUBSIDY BLOCK - col-span-1 */}
-                  <div className="col-span-1 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-205/80 dark:border-amber-900/40 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between min-h-[220px]">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-205/80 dark:border-amber-900/40 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between min-h-[220px]">
                     <div className="space-y-3">
                       <div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-400 font-extrabold text-[10px] uppercase tracking-wider font-mono">
                         <BookOpen className="w-4.5 h-4.5 text-amber-600 dark:text-amber-400" />
@@ -1139,10 +1284,10 @@ export default function App() {
                     >
                       Verify Eligibility Now
                     </button>
-                  </div>
+                  </motion.div>
 
                   {/* CARD 8: HISTORICAL COMPARISONS YIELD PLOT (Sowing lines) - col-span-1 md:col-span-2 lg:col-span-3 */}
-                  <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md space-y-4">
+                  <motion.div variants={dashboardCardVariants} className="col-span-1 md:col-span-2 lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 p-6 rounded-3xl shadow-xs transition-all duration-300 hover:scale-[1.01] hover:shadow-md space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-50 dark:border-slate-805 pb-3">
                       <div>
                         <h4 className="font-extrabold text-sm text-slate-900 dark:text-slate-100 font-display">Crop Sowing Multi-Year Production</h4>
@@ -1160,9 +1305,9 @@ export default function App() {
                         { label: "2026", value: 22 }
                       ]}
                     />
-                  </div>
+                  </motion.div>
 
-                </div>
+                </motion.div>
               </motion.section>
             )}
 
@@ -2473,7 +2618,7 @@ export default function App() {
       {/* -----------------------------------------------------------------------------
           KISAN MITRA FLOATING AI VOICE ASSISTANT CHATBOT
           ----------------------------------------------------------------------------- */}
-      <KisanMitraFloating />
+      <KisanMitraFloating accent={aiAccent} sttLanguage={sttLanguage} />
 
       {/* -----------------------------------------------------------------------------
           SHOPPING CART OVERLAY SHEET
