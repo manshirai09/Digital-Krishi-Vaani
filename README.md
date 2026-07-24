@@ -182,31 +182,31 @@ DigitalKrishiVaani/
 > Add application screenshots here.
 
 ```
-**Login/Signup Screen**
+Login/Signup Screen
 <img width="1918" height="905" alt="image" src="https://github.com/user-attachments/assets/12640dc4-caa2-4946-859d-ea67b7e6ff21" />
 
 
-**Home Screen**
+Home Screen
 <img width="1918" height="906" alt="image" src="https://github.com/user-attachments/assets/a2801d28-02af-419b-ad1a-60317ac1f6f5" />
 
 
-**Dashboard**
+Dashboard
 <img width="1918" height="907" alt="image" src="https://github.com/user-attachments/assets/bc64d6d6-42a6-48fb-9845-f3409ba11ea8" />
 
 
-**AI Assistant**
+AI Assistant
 <img width="1917" height="911" alt="image" src="https://github.com/user-attachments/assets/73d2c56b-9bc8-4d63-a23d-5905554e8a21" />
 
 
-**Marketplace**
+Marketplace
 <img width="1908" height="907" alt="image" src="https://github.com/user-attachments/assets/8aa572d7-2760-40a6-b87c-66487c7b7e10" />
 
 
-**Government Schemes**
+Government Schemes
 <img width="1916" height="911" alt="image" src="https://github.com/user-attachments/assets/0f16697a-a7b5-422a-935e-308e735801a7" />
 
 
-**Disease Scanner**
+Disease Scanner
 <img width="1907" height="900" alt="image" src="https://github.com/user-attachments/assets/6892581d-cd57-4fec-bdcc-b86dbc69a75f" />
 
 ```
