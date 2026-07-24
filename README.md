@@ -179,9 +179,7 @@ DigitalKrishiVaani/
 
 # 📸 Screenshots
 
-> Add application screenshots here.
 
-```
 Login/Signup Screen
 <img width="1918" height="905" alt="image" src="https://github.com/user-attachments/assets/12640dc4-caa2-4946-859d-ea67b7e6ff21" />
 
@@ -209,7 +207,7 @@ Government Schemes
 Disease Scanner
 <img width="1907" height="900" alt="image" src="https://github.com/user-attachments/assets/6892581d-cd57-4fec-bdcc-b86dbc69a75f" />
 
-```
+
 
 ---
 
